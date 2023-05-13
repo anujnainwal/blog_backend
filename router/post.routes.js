@@ -15,4 +15,6 @@ router.get("/allPost", postController.fetchAllPost);
 router.get("/post/:id", postController.singlePost);
 router.put("/updatePost/:id", isAuthenticated, postController.updatePost);
 router.delete("/deletePost/:id", isAuthenticated, postController.deletePost);
+router.post("/like", isAuthenticated, postController.userLike);
+router.post("/dislike", isAuthenticated, postController.userDislike);
 module.exports = router;

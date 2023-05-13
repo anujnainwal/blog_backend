@@ -3,6 +3,7 @@ const postModel = require("../../model/post.model");
 const { createPostvalidation } = require("../../utils/validation/validation");
 const fs = require("fs");
 const path = require("path");
+const userModel = require("../../model/user.model");
 const uploadImageCloudinary = require("../../utils/cloudinary/cloudinary");
 /*
     @route createPost api/v1/createPost
@@ -190,6 +191,166 @@ exports.deletePost = async (req, res, next) => {
       message: "Post deleted successfully",
       deletePost,
     });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+/*
+    @route like post api/v1/post/like
+    @desc like post
+    @access private
+*/
+exports.userLike = async (req, res, next) => {
+  // 1: Find the login User
+  let loginId = req.user._id;
+
+  // 2: Find the post
+  let { postId } = req.body;
+  //check post id is valid or not
+  if (!mongoose.Types.ObjectId.isValid(postId)) {
+    return res.status(400).json({ error: "Invalid post Id." });
+  }
+  try {
+    const post = await postModel.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found." });
+    }
+    //3: Find the user like the post ;
+    const isLiked = post?.isLiked;
+    //4: Find the user dislike the post;
+    const alreadyDisLike = post?.dislikes.find(
+      (userId) => userId?.toString() === loginId?.toString()
+    );
+    if (alreadyDisLike) {
+      const post = await postModel.findByIdAndUpdate(
+        postId,
+        {
+          $pull: {
+            dislikes: loginId,
+          },
+          isDisLiked: false,
+        },
+        {
+          new: true,
+        }
+      );
+      return res
+        .status(200)
+        .json({ message: "Remove dislike the post.", post });
+    }
+    //check user already liked then remove
+    if (isLiked) {
+      const post = await postModel.findByIdAndUpdate(
+        postId,
+        {
+          $pull: {
+            likes: loginId,
+          },
+          isLiked: false,
+        },
+        {
+          new: true,
+        }
+      );
+      return res.status(200).json({ message: "Remove like the post.", post });
+    } else {
+      const post = await postModel.findByIdAndUpdate(
+        postId,
+        {
+          $push: {
+            likes: loginId,
+          },
+          isLiked: true,
+        },
+        {
+          new: true,
+        }
+      );
+      return res
+        .status(200)
+        .json({ status: 1, message: "Liked post successfull", post });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+/*
+    @route disLike post api/v1/post/dislike
+    @desc disLike post api/v1/post/dislike
+    @access private
+*/
+exports.userDislike = async (req, res, next) => {
+  // 1: Find the login User
+  let loginId = req.user._id;
+
+  // 2: Find the post
+  let { postId } = req.body;
+  //check post id is valid or not
+  if (!mongoose.Types.ObjectId.isValid(postId)) {
+    return res.status(400).json({ error: "Invalid post Id." });
+  }
+  try {
+    const post = await postModel.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found." });
+    }
+    //3: Find the user like the post ;
+    const alreadyLike = post?.likes.find(
+      (userId) => userId?.toString() === loginId?.toString()
+    );
+    //4: Find the user dislike the post;
+    const alreadyDisLike = post?.isDisLiked;
+    if (alreadyLike) {
+      const post = await postModel.findByIdAndUpdate(
+        postId,
+        {
+          $pull: {
+            likes: loginId,
+          },
+          isLiked: false,
+        },
+        {
+          new: true,
+        }
+      );
+      return res
+        .status(200)
+        .json({ message: "Remove dislike the post.", post });
+    }
+    //check user already liked then remove
+    if (alreadyDisLike) {
+      const post = await postModel.findByIdAndUpdate(
+        postId,
+        {
+          $pull: {
+            dislikes: loginId,
+          },
+          isDisLiked: false,
+        },
+        {
+          new: true,
+        }
+      );
+      return res
+        .status(200)
+        .json({ message: "Remove dislike the post.", post });
+    } else {
+      const post = await postModel.findByIdAndUpdate(
+        postId,
+        {
+          $push: {
+            dislikes: loginId,
+          },
+          isDisLiked: true,
+        },
+        {
+          new: true,
+        }
+      );
+      return res
+        .status(200)
+        .json({ status: 1, message: " post Dislike successfull", post });
+    }
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

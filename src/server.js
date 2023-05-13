@@ -68,7 +68,8 @@ app.get("/", (req, res, next) => {
 //routes defined here.
 app.use("/api/v1/user", require("../router/user.routes.js"));
 app.use("/api/v1/post", require("../router/post.routes.js"));
-
+app.use("/api/v1/comment", require("../router/comment.routes.js"));
+app.use("/api/v1/category", require("../router/category.routes.js"));
 //not found error Handler
 app.use(notFound404);
 //errorHandler
