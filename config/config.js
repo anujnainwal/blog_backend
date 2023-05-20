@@ -25,7 +25,7 @@ const whiteList = [
   "http://localhost:3001",
   "http://localhost:7000",
   "https://blog-backend-xq2z.onrender.com",
-  "https://blog-1999.netlify.app/register",
+  "https://blog-1999.netlify.app",
 ];
 //cors options
 
