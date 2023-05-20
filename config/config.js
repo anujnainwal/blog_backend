@@ -37,7 +37,7 @@ exports.corsOption = {
       return callback("Not Allowed by cors.");
     }
   },
-  credentials: 200,
+  credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   optionsSuccessStatus: 200,
 };
