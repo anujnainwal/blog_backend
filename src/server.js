@@ -41,7 +41,7 @@ app.use((req, res, next) => {
   res.removeHeader("X-powered-by", false);
   res.setHeader(
     "Access-Control-Allow-Origin",
-    "http://localhost:3000, https://blog-1999.netlify.app"
+    " https://blog-1999.netlify.app"
   );
   res.setHeader(
     "Access-Control-Allow-Headers",
