@@ -24,6 +24,7 @@ const whiteList = [
   "http://localhost:3000",
   "http://localhost:3001",
   "http://localhost:7000",
+  "https://blog-backend-xq2z.onrender.com",
 ];
 //cors options
 
