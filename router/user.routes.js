@@ -10,6 +10,7 @@ router.get("/list", isAuthenticated, userController.fetchAllUser);
 router.put("/profile/:id", isAuthenticated, userController.updateProfile);
 router.post("/follow", isAuthenticated, userController.userFollowing);
 router.post("/blocked/:id", isAuthenticated, userController.isBlocked);
+router.put("/resetPassword", userController.refreshToken);
 router.get("/forgetPassword", userController.forgetPassword);
 router.get(
   "/generateActivationToken",

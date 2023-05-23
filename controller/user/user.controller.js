@@ -12,6 +12,7 @@ const {
 const sendEmail = require("../../utils/sendMail/sendMail");
 const uploadImageCloudinary = require("../../utils/cloudinary/cloudinary");
 const path = require("path");
+const TokenModel = require("../../model/token.model");
 
 /*
     @route register api/v1/user/register
@@ -604,5 +605,41 @@ exports.profileUpdate = async (req, res, next) => {
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });
+  }
+};
+
+exports.refreshToken = async () => {
+  try {
+    const { refreshToken, userId, role } = req.body;
+    if (!ObjecId.isValid(userId)) {
+      return res.status(400).json({ error: "Invalid Id" });
+    }
+    const token = await TokenModel.findOne({ refreshToken: refreshToken });
+    if (!token) {
+      return res.status(404).json({ error: "Token not found" });
+    }
+    if (token.used) {
+      return res.status(400).json({ error: "Token already used" });
+    }
+    if (token.expireAt < new Date()) {
+      await TokenModel.deleteOne({ refreshToken });
+      return res
+        .status(400)
+        .json({ error: "Token was expired. Please login again." });
+    }
+    const user = {
+      _id: userId,
+      role: role,
+    };
+    const accessToken = await generateToken.ACCESS_TOKEN(user);
+    token.used = true;
+    await token.save();
+    return res.json({
+      status: 1,
+      accessToken,
+      message: "Token used successfully",
+    });
+  } catch (error) {
+    console.log(error);
   }
 };
