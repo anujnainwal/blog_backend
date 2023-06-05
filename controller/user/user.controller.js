@@ -68,21 +68,20 @@ exports.Login = async (req, res, next) => {
       .findOne({ email: email })
       .select("+password");
 
-    const accessToken = await generateToken.accessToken(checkEmail);
     if (!checkEmail) {
       return res.status(404).json({ error: `This ${email} not found.` });
     }
     const matchPassword = await checkEmail.matchPassword(password);
     if (!matchPassword) {
       return res.status(401).json({ error: "Invalid Credentails." });
-    } else {
-      return res.status(200).json({
-        status: 1,
-        message: "Login successfully.",
-        userInfo: checkEmail,
-        accessToken: accessToken,
-      });
     }
+    const accessToken = await generateToken.accessToken(checkEmail);
+    return res.status(200).json({
+      status: 1,
+      message: "Login successfully.",
+      userInfo: checkEmail,
+      accessToken: accessToken,
+    });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
