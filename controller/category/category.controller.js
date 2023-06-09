@@ -49,21 +49,36 @@ exports.categoryById = async (req, res, next) => {
 
 exports.fetchAllcategory = async (req, res, next) => {
   try {
+    const page = parseInt(req.query.page) || 1; // Get the page number from the request query parameters
+    const limit = parseInt(req.query.limit) || 10; // Set the number of items to display per page
+
+    const totalCount = await categoryModel.countDocuments(); // Get the total count of categories
+    const totalPages = Math.ceil(totalCount / limit); // Calculate the total number of pages based on the limit
+
+    const skip = (page - 1) * limit; // Calculate the number of items to skip
+
     const category = await categoryModel
       .find()
       .populate("userId")
-      .sort("-createAt");
-    if (category?.length < 0) {
-      return res.status(400).json({ error: "category not found" });
+      .sort("-createAt")
+      .skip(skip)
+      .limit(limit);
+
+    if (category?.length < 1) {
+      return res.status(400).json({ error: "No categories found" });
     }
+
     return res.status(200).json({
-      message: "category successfully fetched.",
+      message: "Categories successfully fetched.",
       categoryInfo: category,
+      currentPage: page,
+      totalPages: totalPages,
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
+
 exports.updatecategory = async (req, res, next) => {
   const loginId = req.user._id;
   const categoryId = req.params.id;

@@ -35,7 +35,8 @@ const createPostvalidation = joi.object({
   description: joi.string().min(10).max(1000).required().trim().normalize(),
   // author: joi.string().required().trim(),
   category: joi.string().required().min(3).max(200).trim(),
-});
+
+})
 
 module.exports = {
   registerValidation,

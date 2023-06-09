@@ -76,13 +76,16 @@ exports.Login = async (req, res, next) => {
       return res.status(401).json({ error: "Invalid Credentails." });
     }
     const accessToken = await generateToken.accessToken(checkEmail);
+    const refreshToken = await generateToken.refreshToken(checkEmail);
     return res.status(200).json({
       status: 1,
       message: "Login successfully.",
       userInfo: checkEmail,
       accessToken: accessToken,
+      refreshToken: refreshToken,
     });
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ error: error.message });
   }
 };
@@ -607,12 +610,12 @@ exports.profileUpdate = async (req, res, next) => {
   }
 };
 
-exports.refreshToken = async () => {
+exports.refreshToken = async (req,res,next) => {
   try {
-    const { refreshToken, userId, role } = req.body;
-    if (!ObjecId.isValid(userId)) {
-      return res.status(400).json({ error: "Invalid Id" });
-    }
+    const { refreshToken, userId } = req.body;
+    // if (!ObjecId.isValid(userId)) {
+    //   return res.status(400).json({ error: "Invalid Id" });
+    // }
     const token = await TokenModel.findOne({ refreshToken: refreshToken });
     if (!token) {
       return res.status(404).json({ error: "Token not found" });
@@ -628,9 +631,9 @@ exports.refreshToken = async () => {
     }
     const user = {
       _id: userId,
-      role: role,
+     
     };
-    const accessToken = await generateToken.ACCESS_TOKEN(user);
+    const accessToken = await generateToken.accessToken(user);
     token.used = true;
     await token.save();
     return res.json({
@@ -642,3 +645,7 @@ exports.refreshToken = async () => {
     console.log(error);
   }
 };
+
+exports.status = async(req,res,next)=>{
+
+}

@@ -24,6 +24,7 @@ function shouldCompress(req, res) {
   // fallback to standard filter function
   return compression.filter(req, res);
 }
+
 app.use(helmet());
 app.use(bodyParser.json({ limit: "10mb" }));
 

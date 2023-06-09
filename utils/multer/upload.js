@@ -3,7 +3,10 @@ const crypto = require("crypto");
 const storage = multer.memoryStorage();
 const path = require("path");
 const sharp = require("sharp");
+
 const fileFilter = (req, file, cb) => {
+ 
+ 
   const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
   const maxSize = 1 * 1024 * 1024; // 1MB
 
@@ -30,6 +33,7 @@ const upload = multer({
 
 const profilePicResize = async (req, res, next) => {
   const profile = req.file;
+ 
 
   if (!req.file) {
     return res
@@ -55,10 +59,11 @@ const profilePicResize = async (req, res, next) => {
 const postImageResize = async (req, res, next) => {
   const post = req.file;
 
+
   if (!req.file) {
     return res
       .status(400)
-      .json({ status: 0, error: "Profile Pic is required." });
+      .json({ status: 0, error: "Post Image is required." });
   }
 
   const maxWidth = 1200; // Maximum width for the resized image
@@ -66,7 +71,10 @@ const postImageResize = async (req, res, next) => {
   const quality = 80; // JPEG compression quality (0-100)
 
   const fileExtension = post.originalname.split(".").pop();
-  const randomFileName = `user-${crypto.randomUUID()}.${fileExtension}`;
+  let imageName = post.originalname.split(".")[0];
+  
+
+  const randomFileName = `${imageName}.${fileExtension}`;
 
   const resizedImagePath = path.join(
     __dirname,
